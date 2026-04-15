@@ -1,3 +1,12 @@
 spring:
   application:
     name: patient-service
+  datasource:
+    url: jdbc:postgresql://localhost:5433/patient_management_system
+    username: postgres
+    password: 1234
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
