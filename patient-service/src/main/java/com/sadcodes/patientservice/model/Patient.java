@@ -34,9 +34,9 @@ public class Patient {
     @NotNull
     private String address;
 
-    @NotNull
-    private LocalDateTime dataOfBirth;
+//    @NotNull
+    private LocalDateTime dateOfBirth;
 
-    @NotNull
+//    @NotNull
     private LocalDateTime registerDate;
 }
