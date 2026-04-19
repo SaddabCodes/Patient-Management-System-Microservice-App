@@ -1,2 +1,6 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+*.sh linguist-vendored
+*.bat linguist-vendored
+mvnw linguist-vendored
+mvnw.cmd linguist-vendored
