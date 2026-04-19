@@ -1,3 +1,7 @@
 .idea/
 *.iml
 Patient Management System - Microservice App.iml
+*.sh linguist-vendored
+*.bat linguist-vendored
+mvnw linguist-vendored
+mvnw.cmd linguist-vendored
