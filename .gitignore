@@ -1,3 +1,7 @@
 .idea/
 *.iml
+*.sh
+*.bat
 Patient Management System - Microservice App.iml
+.m2/
+**/.m2/
