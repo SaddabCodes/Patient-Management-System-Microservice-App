@@ -1,5 +1,6 @@
 package com.sadcodes.patientservice.service;
 
+import com.sadcodes.patientservice.dto.PatientRequestDto;
 import com.sadcodes.patientservice.dto.PatientResponseDto;
 import com.sadcodes.patientservice.mapper.PatientMapper;
 import com.sadcodes.patientservice.model.Patient;
@@ -20,6 +21,11 @@ public class PatientService {
        return patients.stream()
                 .map(patient -> PatientMapper.toDto(patient))
                 .toList();
-
     }
+
+    public PatientResponseDto createPatient(PatientRequestDto patientRequestDto){
+        Patient patient = patientRepository.save(PatientMapper.toModel(patientRequestDto));
+        return PatientMapper.toDto(patient);
+    }
+
 }
