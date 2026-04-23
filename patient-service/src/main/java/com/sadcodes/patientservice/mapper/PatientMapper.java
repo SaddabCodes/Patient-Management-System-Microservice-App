@@ -4,8 +4,6 @@ import com.sadcodes.patientservice.dto.PatientRequestDto;
 import com.sadcodes.patientservice.dto.PatientResponseDto;
 import com.sadcodes.patientservice.model.Patient;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class PatientMapper {
 
@@ -27,9 +25,16 @@ public class PatientMapper {
         patient.setAddress(dto.getAddress());
         patient.setEmail(dto.getEmail());
 
-        // Convert LocalDate → LocalDateTime
+        if (dto.getDateOfBirth() == null) {
+            throw new RuntimeException("DateOfBirth is null");
+        }
+
+        if (dto.getRegisteredDate() == null) {
+            throw new RuntimeException("RegisteredDate is null");
+        }
+
         patient.setDateOfBirth(dto.getDateOfBirth().atStartOfDay());
-        patient.setRegisterDate(dto.getRegisteredDate().atStartOfDay());
+        patient.setRegisteredDate(dto.getRegisteredDate().atStartOfDay());
 
         return patient;
     }
