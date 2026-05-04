@@ -1,0 +1,11 @@
+### PUT request to update patient
+
+PUT http://localhost:4000/patients/52d83fc6-f846-49eb-a322-f8ed8ba18781
+Content-Type: application/json
+
+{
+  "name": "Tom Cruise",
+  "address": "Mumbai",
+  "email": "tomcruise@gmail.com",
+  "dateOfBirth": "2000-01-15"
+}

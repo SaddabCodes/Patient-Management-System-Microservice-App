@@ -103,3 +103,9 @@ Do not assume the database is running during tests or local verification. If a t
 - Do not revert user changes unless explicitly requested.
 - Treat generated `target/` output as build artifacts; do not edit it by hand.
 - Keep commits and patches focused on the requested change.
+
+## Commit Messages
+
+- When the user asks for a git commit message, provide it in a professional conventional-commit style.
+- Prefer prefixes such as `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `build:`, and `ci:` where appropriate.
+- Keep commit messages concise, specific to the actual change, and ready to use without rewriting.
