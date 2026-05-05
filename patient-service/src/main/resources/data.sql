@@ -155,17 +155,3 @@ SELECT '223e4567-e89b-12d3-a456-426614174014',
        '1987-10-17',
        '2024-03-29'
     WHERE NOT EXISTS (SELECT 1 FROM patients WHERE id = '223e4567-e89b-12d3-a456-426614174014');
-
-CREATE TABLE patients
-(
-    id            CHAR(36)                    NOT NULL,
-    address       VARCHAR(255)                NOT NULL,
-    data_of_birth TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    email         VARCHAR(255)                NOT NULL,
-    name          VARCHAR(255)                NOT NULL,
-    register_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    CONSTRAINT patients_pkey PRIMARY KEY (id)
-);
-
-ALTER TABLE patients
-    ADD CONSTRAINT uka370hmxgv0l5c9panryr1ji7d UNIQUE (email);

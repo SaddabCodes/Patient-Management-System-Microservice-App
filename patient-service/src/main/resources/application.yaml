@@ -2,14 +2,19 @@ spring:
   application:
     name: patient-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/patient_management_system
-    username: postgres
-    password: 1234
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234}
 
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
 
 server:
   port: 4000
