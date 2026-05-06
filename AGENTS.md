@@ -17,7 +17,7 @@ Do not use for: refactoring, writing scripts from scratch, debugging business lo
 
 ## Documentation Lookup
 
-Use Context7 MCP to fetch current documentation whenever a task asks about a library, framework, SDK, API, CLI tool, or cloud service. This includes Spring Boot, Spring Data JPA, Jakarta Validation, Maven, PostgreSQL, Lombok, and related setup, configuration, API usage, migration, or debugging questions.
+Use Context7 MCP to fetch current documentation whenever a task asks about a library, framework, SDK, API, CLI tool, or cloud service. This includes Spring Boot, Spring Data JPA, Jakarta Validation, Maven, PostgreSQL, Lombok, Springdoc OpenAPI, Docker, and Docker Compose.
 
 Do not use Context7 for ordinary refactoring, writing project-specific business logic, code review, or general programming concepts.
 
@@ -30,43 +30,78 @@ When Context7 is needed:
 
 ## Project Shape
 
-This repository is a Spring Boot microservice workspace. The only service currently present is:
+This repository is a Spring Boot microservice workspace with two services:
 
-- `patient-service`: Spring Boot 4.0.5 application for patient management.
+- `patient-service`: Spring Boot 4.0.5 service for patient CRUD operations backed by PostgreSQL.
+- `billing-service`: Spring Boot 4.0.6 service scaffold under the `com.sadcodes.billingservice` package.
 
-The service uses:
+Shared characteristics:
 
 - Java 21.
-- Maven Wrapper (`mvnw`, `mvnw.cmd`).
-- Spring Boot starters for Web MVC, Spring Data JPA, and Validation.
+- Maven Wrapper in each service (`mvnw`, `mvnw.cmd`).
+- Spring Boot 4.x.
+- JUnit / Spring Boot test support.
+
+`patient-service` currently includes:
+
+- Spring Web MVC, Spring Data JPA, and Jakarta Validation.
 - PostgreSQL runtime driver.
-- Lombok as an annotation processor.
-- JUnit/Spring Boot test support.
+- Lombok annotation processing.
+- Springdoc OpenAPI UI.
+- Docker assets (`Dockerfile`, `docker-compose.yml`).
+
+`billing-service` currently appears to be an early scaffold with Web MVC and a basic application test.
 
 ## Repository Layout
 
-- Root `AGENTS.md`: guidance for agents working in this repository.
-- `patient-service/pom.xml`: Maven project definition.
-- `patient-service/src/main/java/com/sadcodes/patientservice`: application source.
-- `patient-service/src/main/resources/application.yaml`: service configuration.
-- `patient-service/src/test/java/com/sadcodes/patientservice`: tests.
+- Root `AGENTS.md`: workspace guidance for agents.
+- `patient-service/`: main patient management microservice.
+- `billing-service/`: billing microservice scaffold.
+- `api-request/patient-service/`: HTTP request samples for patient endpoints.
 
-Current domain code includes a `Patient` JPA entity under `com.sadcodes.patientservice.model`. Keep package names consistent with the existing code unless the task explicitly asks for package cleanup or renaming.
+Important paths:
+
+- `patient-service/pom.xml`
+- `patient-service/src/main/java/com/sadcodes/patientservice`
+- `patient-service/src/main/resources/application.yaml`
+- `patient-service/src/test/java/com/sadcodes/patientservice`
+- `patient-service/docker-compose.yml`
+- `patient-service/Dockerfile`
+- `billing-service/pom.xml`
+- `billing-service/src/main/java/com/sadcodes/billingservice`
+- `billing-service/src/main/resources/application.yaml`
+- `billing-service/src/test/java/com/sadcodes/billingservice`
+
+Current patient domain code includes controllers, DTOs, mapping, repository, service, exception handling, and a `Patient` JPA entity under `com.sadcodes.patientservice.model`.
 
 ## Build And Run
 
-Run commands from `patient-service` unless a task explicitly targets the workspace root.
+Run commands from the target service directory unless a task explicitly targets the workspace root.
 
-On Windows PowerShell:
+Windows PowerShell examples:
 
 ```powershell
+cd .\patient-service
 .\mvnw.cmd test
 .\mvnw.cmd spring-boot:run
 ```
 
-On Unix-like shells:
+```powershell
+cd .\billing-service
+.\mvnw.cmd test
+.\mvnw.cmd spring-boot:run
+```
+
+Unix-like examples:
 
 ```sh
+cd patient-service
+./mvnw test
+./mvnw spring-boot:run
+```
+
+```sh
+cd billing-service
 ./mvnw test
 ./mvnw spring-boot:run
 ```
@@ -75,28 +110,50 @@ Use the Maven Wrapper instead of a globally installed Maven whenever possible.
 
 ## Local Configuration
 
-`application.yaml` currently expects PostgreSQL at:
+`patient-service/src/main/resources/application.yaml` currently defaults to:
 
-- URL: `jdbc:postgresql://localhost:5433/patient_management_system`
+- URL: `jdbc:postgresql://localhost:5432/db`
 - Username: `postgres`
 - Password: `1234`
+- Port: `4000`
 
-Do not assume the database is running during tests or local verification. If a task requires application startup or integration testing, confirm whether PostgreSQL is available or document the database dependency clearly.
+These can be overridden with:
+
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+
+`patient-service/docker-compose.yml` provisions:
+
+- PostgreSQL 18 on `localhost:5432`
+- `patient-service` on port `4000`
+
+`billing-service/src/main/resources/application.yaml` currently only sets the Spring application name and has no committed external-service configuration yet.
+
+Do not assume PostgreSQL is running during tests or local verification. If a task requires application startup or integration testing, confirm whether the database is available or document the dependency clearly.
 
 ## Coding Conventions
 
-- Follow the existing Java package root: `com.sadcodes.patientservice`.
-- Prefer constructor/service/controller/repository layers that match common Spring Boot practices when adding behavior.
-- Use Jakarta imports (`jakarta.persistence`, `jakarta.validation`) consistently with Spring Boot 4.
-- Keep validation annotations on API/domain boundaries where they enforce required patient data.
-- Avoid hard-coding new credentials, ports, or environment-specific values unless the task explicitly requires it.
+- Keep package names consistent with the target service: `com.sadcodes.patientservice` for patient-service code and `com.sadcodes.billingservice` for billing-service code.
+- Prefer standard Spring layering: controller, service, repository, DTO/mapper, and exception handling where appropriate.
+- Use Jakarta imports (`jakarta.persistence`, `jakarta.validation`) consistently in Spring Boot 4 code.
+- Keep validation annotations on request or domain boundaries where they enforce required data.
+- Avoid hard-coding new credentials, ports, hosts, or environment-specific values unless the task explicitly requires it.
 - Keep changes scoped to the requested service or module.
+- Do not move code between services unless the task explicitly asks for cross-service refactoring.
 
 ## Testing Guidance
 
-- For code changes, run `.\mvnw.cmd test` from `patient-service` on Windows when feasible.
+- For code changes, run the relevant service tests when feasible: `patient-service` with `.\mvnw.cmd test`, and `billing-service` with `.\mvnw.cmd test`.
 - If tests require a live PostgreSQL instance and it is unavailable, report that limitation instead of hiding the failure.
-- Add focused tests for new service logic, validation behavior, repositories, or controllers when the change affects behavior.
+- Add focused tests for new controller, service, repository, validation, or exception behavior when the change affects behavior.
+- Treat `billing-service` as a separate service for verification; do not assume patient-service tests cover it.
+
+## API Notes
+
+- `patient-service` exposes REST endpoints under `/patients`.
+- Request examples already exist under `api-request/patient-service/`; update them when endpoint contracts change.
+- `patient-service` includes Springdoc OpenAPI UI support, so documentation-related tasks should preserve or intentionally update that integration.
 
 ## Git Safety
 
