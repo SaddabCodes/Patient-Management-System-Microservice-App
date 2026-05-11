@@ -28,6 +28,8 @@ services:
     depends_on:
       postgres-db:
         condition: service_healthy
+      billing-service:
+        condition: service_started
     ports:
       - "4000:4000"
     environment:
@@ -38,6 +40,18 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       SPRING_SQL_INIT_MODE: always
+
+      BILLING_SERVICE_ADDRESS: billing-service
+      BILLING_SERVICE_GRPC_PORT: 9001
+
+  billing-service:
+    build:
+      context: ../billing-service
+    container_name: billing-service
+    restart: always
+    ports:
+      - "4001:4001"
+      - "9001:9001"
 
 volumes:
   postgres_data:

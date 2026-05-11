@@ -4,8 +4,8 @@ POST http://localhost:4000/patients
 Content-Type: application/json
 
 {
-  "name": "Tom Cruise",
-  "email": "tom@example.com",
+  "name": "John Cena with billing account",
+  "email": "johncenabilling@gmail.com",
   "address": "Delhi",
   "dateOfBirth": "2000-01-15",
   "registeredDate": "2026-04-23"

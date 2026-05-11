@@ -4,6 +4,7 @@ import com.sadcodes.patientservice.dto.PatientRequestDto;
 import com.sadcodes.patientservice.dto.PatientResponseDto;
 import com.sadcodes.patientservice.exception.EmailAlreadyExistsException;
 import com.sadcodes.patientservice.exception.PatientNotFoundException;
+import com.sadcodes.patientservice.grpc.BillingServiceGrpcClient;
 import com.sadcodes.patientservice.mapper.PatientMapper;
 import com.sadcodes.patientservice.model.Patient;
 import com.sadcodes.patientservice.repository.PatientRepository;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
     public List<PatientResponseDto> getPatients() {
         List<Patient> patients = patientRepository.findAll();
@@ -31,8 +33,10 @@ public class PatientService {
         if (patientRepository.existsByEmail(patientRequestDto.getEmail())) {
             throw new EmailAlreadyExistsException("A patient with this email is already exists" + patientRequestDto.getEmail());
         }
-        Patient patient = patientRepository.save(PatientMapper.toModel(patientRequestDto));
-        return PatientMapper.toDto(patient);
+        Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDto));
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(),
+                newPatient.getName(), newPatient.getEmail());
+        return PatientMapper.toDto(newPatient);
     }
 
     public PatientResponseDto updatePatient(UUID id, PatientRequestDto patientRequestDto) {
@@ -55,7 +59,7 @@ public class PatientService {
         return PatientMapper.toDto(updatePatient);
     }
 
-    public void deletePatient(UUID id){
+    public void deletePatient(UUID id) {
         patientRepository.deleteById(id);
     }
 
