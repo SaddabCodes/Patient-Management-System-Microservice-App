@@ -32,8 +32,8 @@ When Context7 is needed:
 
 This repository is a Spring Boot microservice workspace with two services:
 
-- `patient-service`: Spring Boot 4.0.5 service for patient CRUD operations backed by PostgreSQL.
-- `billing-service`: Spring Boot 4.0.6 service scaffold under the `com.sadcodes.billingservice` package.
+- `patient-service`: Spring Boot 4.0.5 service for patient CRUD operations backed by PostgreSQL, with a gRPC client for billing integration.
+- `billing-service`: Spring Boot 4.0.6 service under the `com.sadcodes.billingservice` package that exposes a gRPC billing endpoint.
 
 Shared characteristics:
 
@@ -48,16 +48,24 @@ Shared characteristics:
 - PostgreSQL runtime driver.
 - Lombok annotation processing.
 - Springdoc OpenAPI UI.
+- gRPC client integration to call `billing-service`.
 - Docker assets (`Dockerfile`, `docker-compose.yml`).
 
-`billing-service` currently appears to be an early scaffold with Web MVC and a basic application test.
+`billing-service` currently includes:
+
+- Spring Web MVC.
+- gRPC server support on port `9001`.
+- Protobuf definition and generated-service build tooling.
+- A basic application test.
 
 ## Repository Layout
 
 - Root `AGENTS.md`: workspace guidance for agents.
+- Root `README.md`: workspace overview, setup, and run instructions.
 - `patient-service/`: main patient management microservice.
-- `billing-service/`: billing microservice scaffold.
+- `billing-service/`: billing microservice.
 - `api-request/patient-service/`: HTTP request samples for patient endpoints.
+- `grpc-request/billing-service/`: gRPC request samples for billing-service.
 
 Important paths:
 
@@ -70,7 +78,9 @@ Important paths:
 - `billing-service/pom.xml`
 - `billing-service/src/main/java/com/sadcodes/billingservice`
 - `billing-service/src/main/resources/application.yaml`
+- `billing-service/src/main/proto/billing_service.proto`
 - `billing-service/src/test/java/com/sadcodes/billingservice`
+- `grpc-request/billing-service/create-billing-account.http`
 
 Current patient domain code includes controllers, DTOs, mapping, repository, service, exception handling, and a `Patient` JPA entity under `com.sadcodes.patientservice.model`.
 
@@ -127,8 +137,12 @@ These can be overridden with:
 
 - PostgreSQL 18 on `localhost:5432`
 - `patient-service` on port `4000`
+- `billing-service` on ports `4001` and `9001`
 
-`billing-service/src/main/resources/application.yaml` currently only sets the Spring application name and has no committed external-service configuration yet.
+`billing-service/src/main/resources/application.yaml` currently sets:
+
+- HTTP port `4001`
+- gRPC port `9001`
 
 Do not assume PostgreSQL is running during tests or local verification. If a task requires application startup or integration testing, confirm whether the database is available or document the dependency clearly.
 
@@ -154,6 +168,7 @@ Do not assume PostgreSQL is running during tests or local verification. If a tas
 - `patient-service` exposes REST endpoints under `/patients`.
 - Request examples already exist under `api-request/patient-service/`; update them when endpoint contracts change.
 - `patient-service` includes Springdoc OpenAPI UI support, so documentation-related tasks should preserve or intentionally update that integration.
+- `billing-service` exposes a gRPC `createBillingAccount` operation; keep the `.proto` contract and sample requests in sync when changing the gRPC API.
 
 ## Git Safety
 
