@@ -1,6 +1,7 @@
 spring:
   application:
     name: patient-service
+
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/db}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
@@ -15,6 +16,15 @@ spring:
   sql:
     init:
       mode: always
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    topic:
+      patient: ${PATIENT_EVENTS_TOPIC:patient}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
 server:
   port: 4000
