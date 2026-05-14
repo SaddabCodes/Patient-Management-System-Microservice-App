@@ -131,23 +131,21 @@ Default ports:
 
 ## Run With Docker
 
-The compose file is located in `patient-service/docker-compose.yml` and starts:
+The compose file is located at the repository root in `docker-compose.yml` and starts:
 
 - PostgreSQL `18`
 - `patient-service`
 - `billing-service`
 
-Run it from the `patient-service` directory:
+Run it from the repository root:
 
 ```powershell
-cd .\patient-service
 docker compose up --build
 ```
 
 Or on macOS / Linux:
 
 ```sh
-cd patient-service
 docker compose up --build
 ```
 

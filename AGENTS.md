@@ -73,7 +73,7 @@ Important paths:
 - `patient-service/src/main/java/com/sadcodes/patientservice`
 - `patient-service/src/main/resources/application.yaml`
 - `patient-service/src/test/java/com/sadcodes/patientservice`
-- `patient-service/docker-compose.yml`
+- `docker-compose.yml`
 - `patient-service/Dockerfile`
 - `billing-service/pom.xml`
 - `billing-service/src/main/java/com/sadcodes/billingservice`
@@ -133,7 +133,7 @@ These can be overridden with:
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
 
-`patient-service/docker-compose.yml` provisions:
+`docker-compose.yml` provisions:
 
 - PostgreSQL 18 on `localhost:5432`
 - `patient-service` on port `4000`
