@@ -30,10 +30,11 @@ When Context7 is needed:
 
 ## Project Shape
 
-This repository is a Spring Boot microservice workspace with two services:
+This repository is a Spring Boot microservice workspace with three services:
 
 - `patient-service`: Spring Boot 4.0.5 service for patient CRUD operations backed by PostgreSQL, with a gRPC client for billing integration.
 - `billing-service`: Spring Boot 4.0.6 service under the `com.sadcodes.billingservice` package that exposes a gRPC billing endpoint.
+- `api-gateway`: Spring Boot 4.0.6 Spring Cloud Gateway service under the `com.sadcodes.apigateway` package that fronts patient-service routes.
 
 Shared characteristics:
 
@@ -58,12 +59,20 @@ Shared characteristics:
 - Protobuf definition and generated-service build tooling.
 - A basic application test.
 
+`api-gateway` currently includes:
+
+- Spring Cloud Gateway Server WebFlux.
+- Spring Cloud dependency management (`spring-cloud.version` currently `2025.1.1`).
+- Route forwarding for patient REST traffic and patient OpenAPI docs.
+- A basic application test.
+
 ## Repository Layout
 
 - Root `AGENTS.md`: workspace guidance for agents.
 - Root `README.md`: workspace overview, setup, and run instructions.
 - `patient-service/`: main patient management microservice.
 - `billing-service/`: billing microservice.
+- `api-gateway/`: Spring Cloud Gateway entrypoint service.
 - `api-request/patient-service/`: HTTP request samples for patient endpoints.
 - `grpc-request/billing-service/`: gRPC request samples for billing-service.
 
@@ -80,6 +89,10 @@ Important paths:
 - `billing-service/src/main/resources/application.yaml`
 - `billing-service/src/main/proto/billing_service.proto`
 - `billing-service/src/test/java/com/sadcodes/billingservice`
+- `api-gateway/pom.xml`
+- `api-gateway/src/main/java/com/sadcodes/apigateway`
+- `api-gateway/src/main/resources/application.yaml`
+- `api-gateway/src/test/java/com/sadcodes/apigateway`
 - `grpc-request/billing-service/create-billing-account.http`
 
 Current patient domain code includes controllers, DTOs, mapping, repository, service, exception handling, and a `Patient` JPA entity under `com.sadcodes.patientservice.model`.
@@ -102,6 +115,12 @@ cd .\billing-service
 .\mvnw.cmd spring-boot:run
 ```
 
+```powershell
+cd .\api-gateway
+.\mvnw.cmd test
+.\mvnw.cmd spring-boot:run
+```
+
 Unix-like examples:
 
 ```sh
@@ -112,6 +131,12 @@ cd patient-service
 
 ```sh
 cd billing-service
+./mvnw test
+./mvnw spring-boot:run
+```
+
+```sh
+cd api-gateway
 ./mvnw test
 ./mvnw spring-boot:run
 ```
@@ -138,30 +163,39 @@ These can be overridden with:
 - PostgreSQL 18 on `localhost:5432`
 - `patient-service` on port `4000`
 - `billing-service` on ports `4001` and `9001`
+- `api-gateway` is intended to expose gateway traffic on port `4004` when included in the runtime topology
 
 `billing-service/src/main/resources/application.yaml` currently sets:
 
 - HTTP port `4001`
 - gRPC port `9001`
 
+`api-gateway/src/main/resources/application.yaml` currently sets:
+
+- HTTP port `4004`
+- `/api/patients/**` routed to `http://patient-service:4000` with `StripPrefix=1`
+- `/api-docs/patients` rewritten and routed to `http://patient-service:4000/v3/api-docs`
+
 Do not assume PostgreSQL is running during tests or local verification. If a task requires application startup or integration testing, confirm whether the database is available or document the dependency clearly.
 
 ## Coding Conventions
 
-- Keep package names consistent with the target service: `com.sadcodes.patientservice` for patient-service code and `com.sadcodes.billingservice` for billing-service code.
+- Keep package names consistent with the target service: `com.sadcodes.patientservice` for patient-service code, `com.sadcodes.billingservice` for billing-service code, and `com.sadcodes.apigateway` for api-gateway code.
 - Prefer standard Spring layering: controller, service, repository, DTO/mapper, and exception handling where appropriate.
 - Use Jakarta imports (`jakarta.persistence`, `jakarta.validation`) consistently in Spring Boot 4 code.
 - Keep validation annotations on request or domain boundaries where they enforce required data.
 - Avoid hard-coding new credentials, ports, hosts, or environment-specific values unless the task explicitly requires it.
 - Keep changes scoped to the requested service or module.
 - Do not move code between services unless the task explicitly asks for cross-service refactoring.
+- For gateway changes, preserve valid Spring YAML structure and keep route ids, predicates, and filters aligned with downstream service paths.
 
 ## Testing Guidance
 
-- For code changes, run the relevant service tests when feasible: `patient-service` with `.\mvnw.cmd test`, and `billing-service` with `.\mvnw.cmd test`.
+- For code changes, run the relevant service tests when feasible: `patient-service` with `.\mvnw.cmd test`, `billing-service` with `.\mvnw.cmd test`, and `api-gateway` with `.\mvnw.cmd test`.
 - If tests require a live PostgreSQL instance and it is unavailable, report that limitation instead of hiding the failure.
 - Add focused tests for new controller, service, repository, validation, or exception behavior when the change affects behavior.
 - Treat `billing-service` as a separate service for verification; do not assume patient-service tests cover it.
+- Treat `api-gateway` as a separate service for verification; route changes should be checked independently from downstream service tests.
 
 ## API Notes
 
@@ -169,6 +203,8 @@ Do not assume PostgreSQL is running during tests or local verification. If a tas
 - Request examples already exist under `api-request/patient-service/`; update them when endpoint contracts change.
 - `patient-service` includes Springdoc OpenAPI UI support, so documentation-related tasks should preserve or intentionally update that integration.
 - `billing-service` exposes a gRPC `createBillingAccount` operation; keep the `.proto` contract and sample requests in sync when changing the gRPC API.
+- `api-gateway` currently proxies patient REST requests from `/api/patients/**` to `patient-service`.
+- `api-gateway` currently proxies patient OpenAPI docs from `/api-docs/patients` to `patient-service`’s `/v3/api-docs`.
 
 ## Git Safety
 
