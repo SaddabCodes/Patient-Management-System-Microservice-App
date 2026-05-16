@@ -16,3 +16,6 @@ app:
   kafka:
     topic:
       patient: ${PATIENT_EVENTS_TOPIC:patient}
+
+server:
+  port: 4002
